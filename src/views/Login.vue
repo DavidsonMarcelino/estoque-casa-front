@@ -25,7 +25,7 @@
                         </div>      
                     </div>
                 </div>
-                <div class="col-3">
+                <div class="col-3" style="cursor: pointer;">
                     <div class="row justify-content-center" style="height: 100%!important;">
                         <div class="col-8 mt-2 text-center card card-body justify-content-center" data-toggle="modal" data-target="#modalAdd">
                             <div class="row justify-content-center">
@@ -75,6 +75,49 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-3" style="cursor: pointer;" @click="getLista">
+                    <div class="row justify-content-center" style="height: 100%!important;">
+                        <div class="col-8 mt-2 text-center card card-body justify-content-center" data-toggle="modal" data-target="#modalLista">
+                            <div class="row justify-content-center">
+                                <div class="col-12">
+                                    <button class="btn mb-1" style="font-size: 4vh; border: 2px solid #555; border-radius: 120px; height: 13vh; width: 13vh;">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                                <div class="col-12">
+                                    <h4>Verificar lista</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="modalLista" tabindex="-1" role="dialog" aria-labelledby="exameModalLabel" aria-hidden="true">
+                    <div class="modal-lg modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Adicionar item</h5>
+                                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row" style="border-bottom: 1px solid #888;">
+                                    <div class="col-10"><b>Nome</b></div>
+                                    <div class="col-2 text-center"><b>Quantidade</b></div>
+                                </div>
+                                <div class="row" style="border-bottom: 1px solid #888;" v-for="list in lista">
+                                    <div class="col-10">
+                                        <b>{{list.nome}}</b>
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        {{list.quantidade}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer"></div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -88,6 +131,7 @@ export default {
   data() {
     return {
         estoques: [],
+        lista: [],
         estoque_form: {},
         icones: [
             {
@@ -119,6 +163,12 @@ export default {
             `Informações guardadas com sucesso`,
             "success"
           );
+
+          self.estoque_form.nome              = '';
+          self.estoque_form.quantidade        = '';
+          self.estoque_form.quantidade_minima = '';
+          self.estoque_form.icone             = '';
+
           self.getEstoque();
         })
         .catch((error) => {
@@ -163,12 +213,28 @@ export default {
             .catch((error) => {
             self.$message(null, error.response.data, "error");
         });
-    }
+    },
+    getLista: function(id){
+        const self = this;
+        let api = self.$store.state.api + "lista/";
+
+        self.$http
+        .get(api)
+        .then((response) => {
+            self.lista = response.data;
+
+            console.log(self.lista);
+        })
+            .catch((error) => {
+            self.$message(null, error.response.data, "error");
+        });
+    },
   },
   mounted: function () {
     const self = this;
+
     self.getEstoque();
-  
+    self.getLista();
   },
   components: {
     BaseCrud,
